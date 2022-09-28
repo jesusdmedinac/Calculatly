@@ -269,25 +269,6 @@ private fun LastKeyRow(
     }
 }
 
-/**
-divisionRef,
-multiplyRef,
-subtractionRef,
-additionRef,
-equalityRef,
-zeroRef,
-oneRef,
-twoRef,
-threeRef,
-fourRef,
-fiveRef,
-sixRef,
-sevenRef,
-eightRef,
-nineRef,
-pointRef,
- * */
-
 @Composable
 private fun Key(
     key: CalculatorKey,
