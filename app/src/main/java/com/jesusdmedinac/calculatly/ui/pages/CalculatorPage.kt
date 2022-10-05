@@ -2,8 +2,12 @@ package com.jesusdmedinac.calculatly.ui.pages
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ripple.rememberRipple
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -12,16 +16,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.jesusdmedinac.calculatly.ui.theme.CalculatlyTheme
+import com.jesusdmedinac.calculatly.viewmodel.CalculatorViewModel
 
 @ExperimentalFoundationApi
 @Composable
-fun CalculatorPage() {
+fun CalculatorPage(
+    calculatorState: CalculatorViewModel.CalculatorState,
+    onCalculatorKeyClicked: (CalculatorViewModel.CalculatorKey) -> Unit,
+) {
+    val displayText = calculatorState.displayText
     ConstraintLayout(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -46,7 +54,7 @@ fun CalculatorPage() {
             contentAlignment = Alignment.BottomEnd,
         ) {
             Text(
-                text = "0.000000000",
+                text = displayText,
                 color = MaterialTheme.colorScheme.onBackground,
                 style = MaterialTheme.typography.titleLarge.copy(
                     fontSize = 72.sp
@@ -61,10 +69,12 @@ fun CalculatorPage() {
                 start.linkTo(parent.start)
                 end.linkTo(parent.end)
             },
-            firstKey = CalculatorKey.AC,
-            secondKey = CalculatorKey.MORE_OR_LESS,
-            thirdKey = CalculatorKey.PERCENTAGE,
-            fourthKey = CalculatorKey.DIVISION,
+            firstKey = CalculatorViewModel.CalculatorKey.MainKey.Ac,
+            secondKey = CalculatorViewModel.CalculatorKey.MainKey.MoreOrLess,
+            thirdKey = CalculatorViewModel.CalculatorKey.MainKey.Percentage,
+            fourthKey = CalculatorViewModel.CalculatorKey.OperationKey.Division,
+            calculatorState = calculatorState,
+            onCalculatorKeyClicked = onCalculatorKeyClicked,
         )
 
         KeyRow(
@@ -75,10 +85,12 @@ fun CalculatorPage() {
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                 },
-            firstKey = CalculatorKey.SEVEN,
-            secondKey = CalculatorKey.EIGHT,
-            thirdKey = CalculatorKey.NINE,
-            fourthKey = CalculatorKey.MULTIPLY,
+            firstKey = CalculatorViewModel.CalculatorKey.NumberOrPointKey.NumberKey.Seven,
+            secondKey = CalculatorViewModel.CalculatorKey.NumberOrPointKey.NumberKey.Eight,
+            thirdKey = CalculatorViewModel.CalculatorKey.NumberOrPointKey.NumberKey.Nine,
+            fourthKey = CalculatorViewModel.CalculatorKey.OperationKey.Multiply,
+            calculatorState = calculatorState,
+            onCalculatorKeyClicked = onCalculatorKeyClicked,
         )
 
         KeyRow(
@@ -89,10 +101,12 @@ fun CalculatorPage() {
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                 },
-            firstKey = CalculatorKey.FOUR,
-            secondKey = CalculatorKey.FIVE,
-            thirdKey = CalculatorKey.SIX,
-            fourthKey = CalculatorKey.SUBTRACTION,
+            firstKey = CalculatorViewModel.CalculatorKey.NumberOrPointKey.NumberKey.Four,
+            secondKey = CalculatorViewModel.CalculatorKey.NumberOrPointKey.NumberKey.Five,
+            thirdKey = CalculatorViewModel.CalculatorKey.NumberOrPointKey.NumberKey.Six,
+            fourthKey = CalculatorViewModel.CalculatorKey.OperationKey.Subtraction,
+            calculatorState = calculatorState,
+            onCalculatorKeyClicked = onCalculatorKeyClicked,
         )
 
         KeyRow(
@@ -103,10 +117,12 @@ fun CalculatorPage() {
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                 },
-            firstKey = CalculatorKey.ONE,
-            secondKey = CalculatorKey.TWO,
-            thirdKey = CalculatorKey.THREE,
-            fourthKey = CalculatorKey.ADDITION,
+            firstKey = CalculatorViewModel.CalculatorKey.NumberOrPointKey.NumberKey.One,
+            secondKey = CalculatorViewModel.CalculatorKey.NumberOrPointKey.NumberKey.Two,
+            thirdKey = CalculatorViewModel.CalculatorKey.NumberOrPointKey.NumberKey.Three,
+            fourthKey = CalculatorViewModel.CalculatorKey.OperationKey.Addition,
+            calculatorState = calculatorState,
+            onCalculatorKeyClicked = onCalculatorKeyClicked,
         )
 
         LastKeyRow(
@@ -117,6 +133,8 @@ fun CalculatorPage() {
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                 },
+            calculatorState = calculatorState,
+            onCalculatorKeyClicked = onCalculatorKeyClicked,
         )
     }
 }
@@ -124,10 +142,12 @@ fun CalculatorPage() {
 @Composable
 private fun KeyRow(
     modifier: Modifier = Modifier,
-    firstKey: CalculatorKey,
-    secondKey: CalculatorKey,
-    thirdKey: CalculatorKey,
-    fourthKey: CalculatorKey,
+    firstKey: CalculatorViewModel.CalculatorKey,
+    secondKey: CalculatorViewModel.CalculatorKey,
+    thirdKey: CalculatorViewModel.CalculatorKey,
+    fourthKey: CalculatorViewModel.CalculatorKey,
+    calculatorState: CalculatorViewModel.CalculatorState,
+    onCalculatorKeyClicked: (CalculatorViewModel.CalculatorKey) -> Unit,
 ) {
     ConstraintLayout(
         modifier = modifier
@@ -140,7 +160,6 @@ private fun KeyRow(
         val fourthRef = createRef()
 
         Key(
-            firstKey,
             modifier = Modifier
                 .constrainAs(firstRef) {
                     top.linkTo(parent.top)
@@ -148,10 +167,12 @@ private fun KeyRow(
                     start.linkTo(parent.start)
                     end.linkTo(secondRef.start)
                 },
+            firstKey,
+            calculatorState = calculatorState,
+            onCalculatorKeyClicked = onCalculatorKeyClicked,
         )
 
         Key(
-            secondKey,
             modifier = Modifier
                 .constrainAs(secondRef) {
                     top.linkTo(parent.top)
@@ -159,10 +180,12 @@ private fun KeyRow(
                     start.linkTo(firstRef.end)
                     end.linkTo(thirdRef.start)
                 },
+            secondKey,
+            calculatorState = calculatorState,
+            onCalculatorKeyClicked = onCalculatorKeyClicked,
         )
 
         Key(
-            thirdKey,
             modifier = Modifier
                 .constrainAs(thirdRef) {
                     top.linkTo(parent.top)
@@ -170,10 +193,12 @@ private fun KeyRow(
                     start.linkTo(secondRef.end)
                     end.linkTo(fourthRef.start)
                 },
+            thirdKey,
+            calculatorState = calculatorState,
+            onCalculatorKeyClicked = onCalculatorKeyClicked,
         )
 
         Key(
-            fourthKey,
             modifier = Modifier
                 .constrainAs(fourthRef) {
                     top.linkTo(parent.top)
@@ -181,6 +206,9 @@ private fun KeyRow(
                     start.linkTo(thirdRef.end)
                     end.linkTo(parent.end)
                 },
+            fourthKey,
+            calculatorState = calculatorState,
+            onCalculatorKeyClicked = onCalculatorKeyClicked,
         )
     }
 }
@@ -188,6 +216,8 @@ private fun KeyRow(
 @Composable
 private fun LastKeyRow(
     modifier: Modifier = Modifier,
+    calculatorState: CalculatorViewModel.CalculatorState,
+    onCalculatorKeyClicked: (CalculatorViewModel.CalculatorKey) -> Unit,
 ) {
     ConstraintLayout(
         modifier = modifier
@@ -200,9 +230,9 @@ private fun LastKeyRow(
         val fourthRef = createRef()
         val fifthRef = createRef()
 
-        val firstKey = CalculatorKey.ZERO
-        val secondKey = CalculatorKey.POINT
-        val thirdKey = CalculatorKey.EQUALITY
+        val firstKey = CalculatorViewModel.CalculatorKey.NumberOrPointKey.NumberKey.Zero
+        val secondKey = CalculatorViewModel.CalculatorKey.NumberOrPointKey.Point
+        val thirdKey = CalculatorViewModel.CalculatorKey.OperationKey.Equality
         Box(
             modifier = Modifier
                 .constrainAs(firstRef) {
@@ -225,7 +255,7 @@ private fun LastKeyRow(
                 .size(72.dp),
         )
 
-        Box(
+        Button(
             modifier = Modifier
                 .constrainAs(fifthRef) {
                     top.linkTo(parent.top)
@@ -235,18 +265,19 @@ private fun LastKeyRow(
                     width = Dimension.fillToConstraints
                 }
                 .clip(RoundedCornerShape(72.dp))
-                .height(72.dp)
-                .background(firstKey.type.toBackgroundColor()),
-            contentAlignment = Alignment.Center,
+                .height(72.dp),
+            onClick = { onCalculatorKeyClicked(firstKey) },
+            colors = ButtonDefaults.buttonColors(
+                containerColor = firstKey.toBackgroundColor()
+            )
         ) {
             Text(
-                text = firstKey.toStringRes(),
-                color = firstKey.type.toForegroundColor()
+                text = firstKey.toStringResBy(calculatorState),
+                color = firstKey.toForegroundColor()
             )
         }
 
         Key(
-            secondKey,
             modifier = Modifier
                 .constrainAs(thirdRef) {
                     top.linkTo(parent.top)
@@ -254,10 +285,12 @@ private fun LastKeyRow(
                     start.linkTo(secondRef.end)
                     end.linkTo(fourthRef.start)
                 },
+            secondKey,
+            calculatorState = calculatorState,
+            onCalculatorKeyClicked = onCalculatorKeyClicked,
         )
 
         Key(
-            thirdKey,
             modifier = Modifier
                 .constrainAs(fourthRef) {
                     top.linkTo(parent.top)
@@ -265,93 +298,74 @@ private fun LastKeyRow(
                     start.linkTo(thirdRef.end)
                     end.linkTo(parent.end)
                 },
+            thirdKey,
+            calculatorState = calculatorState,
+            onCalculatorKeyClicked = onCalculatorKeyClicked,
         )
     }
 }
 
 @Composable
 private fun Key(
-    key: CalculatorKey,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    key: CalculatorViewModel.CalculatorKey,
+    calculatorState: CalculatorViewModel.CalculatorState,
+    onCalculatorKeyClicked: (CalculatorViewModel.CalculatorKey) -> Unit,
 ) {
-    Box(
+    Button(
         modifier = modifier
             .clip(RoundedCornerShape(72.dp))
-            .size(72.dp)
-            .background(key.type.toBackgroundColor()),
-        contentAlignment = Alignment.Center,
+            .size(72.dp),
+        onClick = { onCalculatorKeyClicked(key) },
+        colors = ButtonDefaults.buttonColors(
+            containerColor = key.toBackgroundColor()
+        )
     ) {
         Text(
-            text = key.toStringRes(),
-            color = key.type.toForegroundColor()
+            text = key.toStringResBy(calculatorState),
+            color = key.toForegroundColor()
         )
     }
 }
 
 @Composable
-private fun CalculatorKey.KeyType.toBackgroundColor(): Color = when (this) {
-    CalculatorKey.KeyType.MAIN -> MaterialTheme.colorScheme.primary
-    CalculatorKey.KeyType.OPERATION -> MaterialTheme.colorScheme.secondary
-    CalculatorKey.KeyType.NUMBER -> MaterialTheme.colorScheme.tertiary
+private fun CalculatorViewModel.CalculatorKey.toBackgroundColor(): Color = when (this) {
+    is CalculatorViewModel.CalculatorKey.MainKey -> MaterialTheme.colorScheme.primary
+    is CalculatorViewModel.CalculatorKey.OperationKey -> MaterialTheme.colorScheme.secondary
+    is CalculatorViewModel.CalculatorKey.NumberOrPointKey -> MaterialTheme.colorScheme.tertiary
 }
 
 @Composable
-private fun CalculatorKey.KeyType.toForegroundColor(): Color = when (this) {
-    CalculatorKey.KeyType.MAIN -> MaterialTheme.colorScheme.onPrimary
-    CalculatorKey.KeyType.OPERATION -> MaterialTheme.colorScheme.onSecondary
-    CalculatorKey.KeyType.NUMBER -> MaterialTheme.colorScheme.onTertiary
+private fun CalculatorViewModel.CalculatorKey.toForegroundColor(): Color = when (this) {
+    is CalculatorViewModel.CalculatorKey.MainKey -> MaterialTheme.colorScheme.onPrimary
+    is CalculatorViewModel.CalculatorKey.OperationKey -> MaterialTheme.colorScheme.onSecondary
+    is CalculatorViewModel.CalculatorKey.NumberOrPointKey -> MaterialTheme.colorScheme.onTertiary
 }
 
-private fun CalculatorKey.toStringRes() = when (this) {
-    CalculatorKey.AC -> "AC"
-    CalculatorKey.MORE_OR_LESS -> "+/-"
-    CalculatorKey.PERCENTAGE -> "%"
-    CalculatorKey.DIVISION -> "/"
-    CalculatorKey.MULTIPLY -> "*"
-    CalculatorKey.SUBTRACTION -> "-"
-    CalculatorKey.ADDITION -> "+"
-    CalculatorKey.EQUALITY -> "="
-    CalculatorKey.ZERO -> "0"
-    CalculatorKey.ONE -> "1"
-    CalculatorKey.TWO -> "2"
-    CalculatorKey.THREE -> "3"
-    CalculatorKey.FOUR -> "4"
-    CalculatorKey.FIVE -> "5"
-    CalculatorKey.SIX -> "6"
-    CalculatorKey.SEVEN -> "7"
-    CalculatorKey.EIGHT -> "8"
-    CalculatorKey.NINE -> "9"
-    CalculatorKey.POINT -> "."
-}
-
-enum class CalculatorKey(
-    val type: KeyType,
-) {
-    AC(KeyType.MAIN),
-    MORE_OR_LESS(KeyType.MAIN),
-    PERCENTAGE(KeyType.MAIN),
-    DIVISION(KeyType.OPERATION),
-    MULTIPLY(KeyType.OPERATION),
-    SUBTRACTION(KeyType.OPERATION),
-    ADDITION(KeyType.OPERATION),
-    EQUALITY(KeyType.OPERATION),
-    ZERO(KeyType.NUMBER),
-    ONE(KeyType.NUMBER),
-    TWO(KeyType.NUMBER),
-    THREE(KeyType.NUMBER),
-    FOUR(KeyType.NUMBER),
-    FIVE(KeyType.NUMBER),
-    SIX(KeyType.NUMBER),
-    SEVEN(KeyType.NUMBER),
-    EIGHT(KeyType.NUMBER),
-    NINE(KeyType.NUMBER),
-    POINT(KeyType.NUMBER);
-
-    enum class KeyType {
-        MAIN,
-        OPERATION,
-        NUMBER
-    }
+private fun CalculatorViewModel.CalculatorKey.toStringResBy(
+    calculatorState: CalculatorViewModel.CalculatorState,
+) = when (this) {
+    CalculatorViewModel.CalculatorKey.MainKey.Ac ->
+        if (calculatorState.shouldDisplayACKey) "AC"
+        else "C"
+    CalculatorViewModel.CalculatorKey.MainKey.MoreOrLess -> "+/-"
+    CalculatorViewModel.CalculatorKey.MainKey.Percentage -> "%"
+    CalculatorViewModel.CalculatorKey.OperationKey.Addition -> "+"
+    CalculatorViewModel.CalculatorKey.OperationKey.Division -> "/"
+    CalculatorViewModel.CalculatorKey.OperationKey.Multiply -> "*"
+    CalculatorViewModel.CalculatorKey.OperationKey.Subtraction -> "-"
+    CalculatorViewModel.CalculatorKey.OperationKey.Equality -> "="
+    CalculatorViewModel.CalculatorKey.NumberOrPointKey.NumberKey.Zero -> "0"
+    CalculatorViewModel.CalculatorKey.NumberOrPointKey.NumberKey.One -> "1"
+    CalculatorViewModel.CalculatorKey.NumberOrPointKey.NumberKey.Two -> "2"
+    CalculatorViewModel.CalculatorKey.NumberOrPointKey.NumberKey.Three -> "3"
+    CalculatorViewModel.CalculatorKey.NumberOrPointKey.NumberKey.Four -> "4"
+    CalculatorViewModel.CalculatorKey.NumberOrPointKey.NumberKey.Five -> "5"
+    CalculatorViewModel.CalculatorKey.NumberOrPointKey.NumberKey.Six -> "6"
+    CalculatorViewModel.CalculatorKey.NumberOrPointKey.NumberKey.Seven -> "7"
+    CalculatorViewModel.CalculatorKey.NumberOrPointKey.NumberKey.Eight -> "8"
+    CalculatorViewModel.CalculatorKey.NumberOrPointKey.NumberKey.Nine -> "9"
+    CalculatorViewModel.CalculatorKey.NumberOrPointKey.Point -> "."
 }
 
 @ExperimentalFoundationApi
@@ -359,7 +373,7 @@ enum class CalculatorKey(
 @Composable
 fun CalculatorPagePreviewOne() {
     CalculatlyTheme {
-        CalculatorPage()
+        CalculatorPage(CalculatorViewModel.CalculatorState(), {})
     }
 }
 
@@ -368,6 +382,7 @@ fun CalculatorPagePreviewOne() {
 @Composable
 fun CalculatorPagePreviewTwo() {
     CalculatlyTheme {
-        CalculatorPage()
+        CalculatorPage(
+            CalculatorViewModel.CalculatorState(), {})
     }
 }
